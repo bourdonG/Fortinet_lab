@@ -50,3 +50,6 @@ On suit les indications du Wizard, interfaces entretantes/sortantes, on chiffre 
 
 Sur HQ on utiliser l'ipv4 du port 2 de Branch et réciproquement sur Branch
 
+4/ On active le traffic pour monter le tunnel IPsec, dans l'onglet Monitor>IPsec Monitor
+
+5/ Dans l'onglet VPN>IPsec tunnel on affiche la configuration que ce soit sur HQ ou Branch
