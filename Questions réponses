@@ -40,3 +40,11 @@ Lors de la première connexion l'interface nous propose de mettre un mot de pass
 
 On configure les interfaces dans l'onglet Network
 
+Sur le port3 l'interface LAN et sur le port 2 l'interface internet (on laissera DHCP attribuer une adresse ipv4)
+
+On configure également les POLICIES
+
+3/ Dans l'onglet VPN on utiliser IPsec Wizard
+
+On suit les indications du Wizard, interfaces entretantes/sortantes, on chiffre avec une clé RSA2048
+
