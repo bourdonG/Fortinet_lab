@@ -1,0 +1,42 @@
+Questions:
+
+1/ Vérifier la configuration de HQ (nom et connectivité)
+2/ Configurer Branch : Nom, interfaces, service DHCP, NAT, Policy
+3/ Configurer le VPN IPSEC entre HQ et Branch avec le VPN Wizard
+4/ Montrer la connectivité entre le LAN HQ (60.0/24) et le LAN Branch (61.0/24) et inversément via des tests pings et des logs.
+5/ Quels sont les paramètres IPSEC utilisés par le Wizard ? Comment obtenir cette information.
+6/ Exporter sa config et la livrer sur un repo github
+
+Réponses:
+
+1/ On ouvre la topologie dans GNS3
+
+On se connecte à HQ, login/mdg : admin/testtest
+Changement du hostname:
+
+HQ-18 # config system global
+HQ-18 (global) # set hostname HQ-6
+
+Avec la commande suivante on vérifie les interfaces: 
+HQ-6 # get system interface physical
+
+        ==[port1]
+                ip: 192.168.122.191 255.255.255.0         
+        ==[port2]
+                ip: 192.168.122.192 255.255.255.0
+        ==[port3]
+                ip: 192.168.60.1 255.255.255.0               
+        ==[port4]             
+                ip: 192.168.102.1 255.255.255.0
+                
+On remarque que les adresses sont correctes d'après la topologie
+              
+On se connecte à l'interface de FortiGate via l'URL: http://192.168.122.191
+
+2/ Même chose que pour HQ avec la commande get system interface physical on récupère l'interface qui va nous permettre de nous connecter
+à FortiGate, soit: http://192.168.122.127
+
+Lors de la première connexion l'interface nous propose de mettre un mot de passe, celui ci sera "testtest"
+
+On configure les interfaces dans l'onglet Network
+
