@@ -50,6 +50,19 @@ On suit les indications du Wizard, interfaces entretantes/sortantes, on chiffre 
 
 Sur HQ on utiliser l'ipv4 du port 2 de Branch et réciproquement sur Branch
 
-4/ On active le traffic pour monter le tunnel IPsec, dans l'onglet Monitor>IPsec Monitor
+On active le traffic pour monter le tunnel IPsec, dans l'onglet Monitor>IPsec Monitor
+
+4/ On test la connectivité via ping
+
+[root@client-branch ~]# ping 1.1.1.1
+PING 1.1.1.1 (1.1.1.1) 56(84) bytes of data.
+64 bytes from 1.1.1.1: icmp_seq=1 ttl=58 time=3.92 ms
+
+[root@client-branch ~]# ping 192.168.60.1
+PING 192.168.60.1 (192.168.60.1) 56(84) bytes of data.
+64 bytes from 192.168.60.1: icmp_seq=1 ttl=254 time=4.27 ms
+
 
 5/ Dans l'onglet VPN>IPsec tunnel on affiche la configuration que ce soit sur HQ ou Branch
+
+6/ Voir pièces jointes
