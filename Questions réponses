@@ -48,3 +48,5 @@ On configure également les POLICIES
 
 On suit les indications du Wizard, interfaces entretantes/sortantes, on chiffre avec une clé RSA2048
 
+Sur HQ on utiliser l'ipv4 du port 2 de Branch et réciproquement sur Branch
+
