@@ -1,3 +1,10 @@
+
+
+
+
+
+Rappel:
+
 R1#sh crypto isakmp policy
 
 Default IKE policy
