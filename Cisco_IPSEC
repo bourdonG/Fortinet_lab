@@ -28,6 +28,21 @@ ip access-list extended LAN_REMOTE
 ip nat inside source list LAN_REMOTE interface G0/1 overload
 end
 
+On peut tester la connexion à l'internet, ping 1.1.1.1:
+
+remote#ping 1.1.1.1
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 1.1.1.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 3/3/4 ms
+
+De même depuis le poste de travail Centos:
+
+[root@localhost ~]# ping 1.1.1.1
+PING 1.1.1.1 (1.1.1.1) 56(84) bytes of data.
+64 bytes from 1.1.1.1: icmp_seq=1 ttl=58 time=4.91 ms
+
+
 3/ Paramètres ISAKMP et IPSEC
 
 Sur le routeur Remote:
@@ -98,9 +113,9 @@ ip access-list extended crypto-acl
 !
 no ip access-list standard LAN_NAT
 ip access-list extended LAN_NAT
- deny ip 192.168.59.0 0.0.0.255 192.168.14.0 0.0.0.255
- permit ip 192.168.59.0 0.0.0.255 any
- permit ip 192.168.101.0 0.0.0.255 any
+ 5 deny ip 192.168.59.0 0.0.0.255 192.168.14.0 0.0.0.255
+ 10 permit ip 192.168.59.0 0.0.0.255 any
+ 20 permit ip 192.168.101.0 0.0.0.255 any
 !
 end
 
@@ -144,5 +159,24 @@ Sur quelle Policy Map appliquer les règles qui autorisent le trafic ISAKMP / IP
 Réponse : to-self-policy (voir configuration ci dessus)
 
 7/ Vérifications
+
+On effectue des commandes pings entre les différents composants:
+
+remote#ping 192.168.122.182 (R1)
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.122.182, timeout is 2 seconds:
+!!!!!
+
+R1#ping 192.168.122.225 (Remote)
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 192.168.122.225, timeout is 2 seconds:
+!!!!!
+
+La station de travail Centos arrive également à ping R1:
+
+[root@localhost ~]# ping 192.168.122.182
+PING 192.168.122.182 (192.168.122.182) 56(84) bytes of data.
+64 bytes from 192.168.122.182: icmp_seq=1 ttl=254 time=5.07 ms
+
 
 
