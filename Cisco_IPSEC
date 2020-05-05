@@ -38,12 +38,12 @@ crypto isakmp policy 1
  group 5
  lifetime 7200
 !
-crypto isakmp key cisco123 address 192.168.122.xxx     <-----------------     (VERIFIER L'ADRESSE IPV4)
+crypto isakmp key cisco123 address 192.168.122.182     <-----------------     (VERIFIER L'ADRESSE IPV4)
 !
 crypto ipsec transform-set to-R1-set esp-aes 256 esp-sha-hmac
 !
 crypto map cm-to-R1 1 ipsec-isakmp
- set peer 192.168.122.xxx                              <-----------------     (VERIFIER L'ADRESSE IPV4)
+ set peer 192.168.122.182                             <-----------------     (VERIFIER L'ADRESSE IPV4)
  set transform-set to-R1-set
  match address crypto-acl
 !
