@@ -1,4 +1,4 @@
-R1(config)#do sh crypto isakmp policy
+R1#sh crypto isakmp policy
 
 Default IKE policy
 Protection suite of priority 65507
@@ -8,4 +8,7 @@ Protection suite of priority 65507
         Diffie-Hellman group:   #5 (1536 bit)
         lifetime:               86400 seconds, no volume limit
 
+R1#show crypto isakmp sa
+
+R1#show crypto isakmp peers
 
