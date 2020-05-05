@@ -1,3 +1,64 @@
+1/ On met en place le routeur Remote dans la topologie ainsi qu'un Centos pour la station de travail
+
+2/ Mise en place de Remote
+
+On configure le routeur Remote, hostname, interfaces, DHCP, NAT:
+
+hostname remote
+!
+interface G0/0
+ ip address 192.168.14.1 255.255.255.0
+ ip nat inside
+ no shutdown
+!
+interface GigabitEthernet0/1
+ ! ip address 192.168.122.250 255.255.255.0
+ ip address dhcp
+ ip nat outside
+ no shutdown
+!
+ip dhcp pool lan
+ network 192.168.14.0 255.255.255.0
+ default-router 192.168.14.1
+ dns-server 1.1.1.1
+ip route 0.0.0.0 0.0.0.0 192.168.122.1
+ip access-list extended LAN_REMOTE
+ permit ip 192.168.14.0 0.0.0.255 any
+!
+ip nat inside source list LAN_REMOTE interface G0/1 overload
+end
+
+3/ Paramètres ISAKMP et IPSEC
+
+Sur le routeur Remote:
+
+crypto isakmp policy 1
+ encr aes 256
+ authentication pre-share
+ group 5
+ lifetime 7200
+!
+crypto isakmp key cisco123 address 192.168.122.xxx     <-----------------     (VERIFIER L'ADRESSE IPV4)
+!
+crypto ipsec transform-set to-R1-set esp-aes 256 esp-sha-hmac
+!
+crypto map cm-to-R1 1 ipsec-isakmp
+ set peer 192.168.122.xxx                              <-----------------     (VERIFIER L'ADRESSE IPV4)
+ set transform-set to-R1-set
+ match address crypto-acl
+!
+interface G0/1
+ crypto map cm-to-R1
+!
+ip access-list extended crypto-acl
+ permit ip 192.168.14.0 0.0.0.255 192.168.59.0 0.0.0.255
+!
+ip access-list extended LAN_REMOTE
+ 5 deny ip 192.168.14.0 0.0.0.255 192.168.59.0 0.0.0.255
+ 10 permit ip 192.168.14.0 0.0.0.255 any
+!
+ip nat inside source list LAN_REMOTE interface G0/1 overload
+end
 
 
 
