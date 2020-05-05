@@ -12,7 +12,7 @@ interface G0/0
  no shutdown
 !
 interface GigabitEthernet0/1
- ! ip address 192.168.122.250 255.255.255.0
+ ip address 192.168.122.250 255.255.255.0
  ip address dhcp
  ip nat outside
  no shutdown
@@ -38,12 +38,12 @@ crypto isakmp policy 1
  group 5
  lifetime 7200
 !
-crypto isakmp key cisco123 address 192.168.122.182     <-----------------     (VERIFIER L'ADRESSE IPV4)
+crypto isakmp key cisco123 address 192.168.122.182     <-----------------     (VERIFIER L'ADRESSE IPV4 sur R1)
 !
 crypto ipsec transform-set to-R1-set esp-aes 256 esp-sha-hmac
 !
 crypto map cm-to-R1 1 ipsec-isakmp
- set peer 192.168.122.182                             <-----------------     (VERIFIER L'ADRESSE IPV4)
+ set peer 192.168.122.182                             <-----------------     (VERIFIER L'ADRESSE IPV4 sur R1)
  set transform-set to-R1-set
  match address crypto-acl
 !
@@ -60,23 +60,89 @@ ip access-list extended LAN_REMOTE
 ip nat inside source list LAN_REMOTE interface G0/1 overload
 end
 
+4/ Questions:
+
+Quel est le trafic qui doit passer dans le tunnel (source et destination) ?
+Réponse : 192.168.14.0 0.0.0.255 192.168.59.0 0.0.0.255
+
+Quel est le trafic qui doit être traduit (source) ?
+Réponse : 192.168.14.0 0.0.0.255 any
+
+Quel est le trafic qui ne doit pas être traduit (source et destination) ?
+Réponse : 192.168.14.0 0.0.0.255 192.168.59.0 0.0.0.255
+
+5/ Configuration VPN de R1
+
+Même chose sur R1:
+
+crypto isakmp policy 1
+ encr aes 256
+ authentication pre-share
+ group 5
+ lifetime 7200
+!
+crypto isakmp key cisco123 address 192.168.122.225          <-----------------     (VERIFIER L'ADRESSE IPV4 sur Remote)
+!
+crypto ipsec transform-set to-remote-set esp-aes 256 esp-sha-hmac
+!
+crypto map cm-to-remote 1 ipsec-isakmp
+ set peer 192.168.122.225                                   <-----------------     (VERIFIER L'ADRESSE IPV4 sur Remote)
+ set transform-set to-remote-set
+ match address crypto-acl
+!
+interface G0/1
+ crypto map cm-to-remote
+!
+ip access-list extended crypto-acl
+ permit ip 192.168.59.0 0.0.0.255 192.168.14.0 0.0.0.255
+!
+no ip access-list standard LAN_NAT
+ip access-list extended LAN_NAT
+ deny ip 192.168.59.0 0.0.0.255 192.168.14.0 0.0.0.255
+ permit ip 192.168.59.0 0.0.0.255 any
+ permit ip 192.168.101.0 0.0.0.255 any
+!
+end
 
 
+Questions:
+
+Quel est le trafic qui doit passer dans le tunnel (source et destination) ?
+Réponse : 192.168.59.0 0.0.0.255 192.168.14.0 0.0.0.255
+
+Quel est le trafic qui doit être traduit (source) ?
+Réponse : 192.168.59.0 0.0.0.255 any et 192.168.101.0 0.0.0.255 any
+
+Quel est le trafic qui ne doit pas être traduit (source et destination) ?
+Réponse : 192.168.59.0 0.0.0.255 192.168.14.0 0.0.0.255
 
 
-Rappel:
+6/ Adaptation du pare-feu R1
 
-R1#sh crypto isakmp policy
+Sur R1:
 
-Default IKE policy
-Protection suite of priority 65507
-        encryption algorithm:   AES - Advanced Encryption Standard (128 bit keys).
-        hash algorithm:         Secure Hash Standard
-        authentication method:  Rivest-Shamir-Adleman Signature
-        Diffie-Hellman group:   #5 (1536 bit)
-        lifetime:               86400 seconds, no volume limit
+ip access-list extended ISAKMP_IPSEC
+ permit udp any any eq isakmp
+ permit ahp any any
+ permit esp any any
+ permit udp any any eq non500-isakmp
 
-R1#show crypto isakmp sa
+class-map type inspect match-any vpn-class
+ match access-group name ISAKMP_IPSEC
 
-R1#show crypto isakmp peers
+policy-map type inspect to-self-policy
+ class type inspect vpn-class
+  inspect
+end
+
+Questions:
+
+Quel sont les protocoles à autoriser ?
+Réponse : UDP500, AHP (IP 51) et ESP (IP50)
+
+Sur quelle Policy Map appliquer les règles qui autorisent le trafic ISAKMP / IPSEC ?
+Réponse : to-self-policy (voir configuration ci dessus)
+
+7/ Vérifications
+
 
